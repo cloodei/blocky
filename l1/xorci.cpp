@@ -1,12 +1,23 @@
 #include <iostream>
-#include <cmath>
 #include <string>
-typedef __int128 i128;
 using namespace std;
 
 int main() {
-    cin.tie(nullptr)->sync_with_stdio(false);
-    
+    char key;
+    long long test;
+    do {
+	    cout << "Key: ";
+    	cin >> test;
+    } while (test <= 0 || test > 255);
+    key = test;
+
+    getchar();
+    string text;
+    cout << "Text: ";
+    getline(cin, text);
+
+    for (int i = 0; i < text.length(); ++i)
+    	cout << (char)(text[i] ^ key);
 
     return 0;
 }
