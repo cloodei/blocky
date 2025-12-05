@@ -80,18 +80,6 @@ static void transform(uint8_t* chunk) noexcept {
 	state[7] += h;
 }
 
-inline void update(uint8_t* data, size_t length) noexcept {
-    while (length >= 64) {
-        transform(data);
-        data += 64;
-        length -= 64;
-    }
-}
-
-inline void update(const string& data) noexcept {
-    update(reinterpret_cast<const uint8_t*>(data.c_str()), data.length());
-}
-
 string final_hex(uint8_t* data, size_t length) noexcept {
     size_t l = length;
     while (l >= 64) {
@@ -113,14 +101,13 @@ string final_hex(uint8_t* data, size_t length) noexcept {
         bitLength >>= 8;
     }
 
-    processBlock(buffer);
+    transform(buffer);
     if (l >= 56)
-        processBlock(buffer + 64);
+        transform(buffer + 64);
 
     stringstream ss;
-    ss << std::hex << setfill('0');
     for (size_t j = 0; j < 8; ++j)
-        ss << setw(8) << state[j];
+        ss << std::hex << setw(8) << setfill('0') << state[j];
         
     return ss.str();
 }
@@ -146,9 +133,9 @@ uint8_t* final(uint8_t* data, size_t length) noexcept {
         bitLength >>= 8;
     }
 
-    processBlock(buffer);
+    transform(buffer);
     if (l >= 56)
-        processBlock(buffer + 64);
+        transform(buffer + 64);
 
     uint8_t* res = new uint8_t[32];
     for (size_t i = 0; i < 8; i++) {
@@ -170,8 +157,9 @@ inline string to_hex(const uint8_t* d) noexcept {
     return oss.str();
 }
 
-inline string shaff(string& input) noexcept {
-    auto res = final_hex();
+
+inline string shaff(uint8_t* input, size_t length) noexcept {
+    auto res = final_hex(input, length);
     state[0] = 0x6a09e667;
     state[1] = 0xbb67ae85;
     state[2] = 0x3c6ef372;
@@ -184,8 +172,12 @@ inline string shaff(string& input) noexcept {
     return res;
 }
 
-inline string sha256(string& input) noexcept {
-    auto res = final();
+inline string shaff(string& input) noexcept {
+    return shaff((uint8_t*)input.data(), input.size());
+}
+
+inline uint8_t* sha256(uint8_t* input, size_t length) noexcept {
+    auto res = final(input, length);
     state[0] = 0x6a09e667;
     state[1] = 0xbb67ae85;
     state[2] = 0x3c6ef372;
@@ -196,4 +188,8 @@ inline string sha256(string& input) noexcept {
     state[7] = 0x5be0cd19;
 
     return res;
+}
+
+inline uint8_t* sha256(string& input) noexcept {
+    return sha256((uint8_t*)input.data(), input.size());
 }
