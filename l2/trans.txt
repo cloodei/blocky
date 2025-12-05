@@ -1,0 +1,4 @@
+COINBASE 10 Alice
+Alice 4 Bob
+Alice 3 Carol
+Bob 2 Dave

@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 #include <iomanip>
 #include <string>
 #include <cstring>
@@ -31,20 +32,21 @@ static inline uint32_t majority(uint32_t a, uint32_t b, uint32_t c) noexcept {
 }
 
 static inline uint32_t sig0(uint32_t x) noexcept {
-	return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3);
+    return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3);
 }
 
 static inline uint32_t sig1(uint32_t x) noexcept {
-	return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10);
+    return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10);
 }
 
 static inline uint32_t Sig0(uint32_t x) noexcept {
-	return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
+    return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
 }
 
 static inline uint32_t Sig1(uint32_t x) noexcept {
-	return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
+    return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
 }
+
 
 static void transform(uint8_t* chunk) noexcept {
     uint32_t a = state[0], b = state[1], c = state[2], d = state[3], e = state[4], f = state[5], g = state[6], h = state[7];
@@ -71,13 +73,13 @@ static void transform(uint8_t* chunk) noexcept {
     }
 
     state[0] += a;
-	state[1] += b;
-	state[2] += c;
-	state[3] += d;
+    state[1] += b;
+    state[2] += c;
+    state[3] += d;
     state[4] += e;
-	state[5] += f;
-	state[6] += g;
-	state[7] += h;
+    state[5] += f;
+    state[6] += g;
+    state[7] += h;
 }
 
 string final_hex(uint8_t* data, size_t length) noexcept {
@@ -96,7 +98,7 @@ string final_hex(uint8_t* data, size_t length) noexcept {
     memset(buffer + l + 1, 0, paddingSize - 1);
 
     size_t bitLength = length * 8;
-    for (size_t i = 7; i >= 0; i--) {
+    for (int i = 7; i >= 0; i--) {
         buffer[l + paddingSize + i] = bitLength & 0xff;
         bitLength >>= 8;
     }
@@ -127,8 +129,8 @@ uint8_t* final(uint8_t* data, size_t length) noexcept {
     buffer[l] = 0x80;
     memset(buffer + l + 1, 0, paddingSize - 1);
 
-    size_t bitLength = length << 3;
-    for (size_t i = 7; i >= 0; i--) {
+    size_t bitLength = length * 8;
+    for (int i = 7; i >= 0; i--) {
         buffer[l + paddingSize + i] = bitLength & 0xff;
         bitLength >>= 8;
     }
@@ -158,7 +160,7 @@ inline string to_hex(const uint8_t* d) noexcept {
 }
 
 
-inline string shaff(uint8_t* input, size_t length) noexcept {
+inline string sha2(uint8_t* input, size_t length) noexcept {
     auto res = final_hex(input, length);
     state[0] = 0x6a09e667;
     state[1] = 0xbb67ae85;
@@ -172,8 +174,8 @@ inline string shaff(uint8_t* input, size_t length) noexcept {
     return res;
 }
 
-inline string shaff(string& input) noexcept {
-    return shaff((uint8_t*)input.data(), input.size());
+inline string sha2(const string& input) noexcept {
+    return sha2((uint8_t*)input.data(), input.size());
 }
 
 inline uint8_t* sha256(uint8_t* input, size_t length) noexcept {
@@ -190,6 +192,6 @@ inline uint8_t* sha256(uint8_t* input, size_t length) noexcept {
     return res;
 }
 
-inline uint8_t* sha256(string& input) noexcept {
+inline uint8_t* sha256(const string& input) noexcept {
     return sha256((uint8_t*)input.data(), input.size());
 }
