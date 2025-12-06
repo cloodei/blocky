@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cmath>
 #include <cstdint>
 #include <string>
 #include "sha256.cpp"
@@ -7,39 +6,52 @@ using namespace std;
 
 uint32_t n, nonce = 0;
 uint64_t blockNum, go;
-uint8_t* hsah;
+uint64_t* hsah;
 const string d = "Hello PoW";
 
-inline uint64_t be(uint8_t* ptr) noexcept {
+inline uint64_t be(uint64_t* ptr) noexcept {
     uint64_t x;
-    memcpy(&x, ptr, sizeof(x));
+    memcpy(&x, (uint8_t*)ptr, 8);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     x = __builtin_bswap64(x);
 #endif
+
     return x;
 }
 
+// inline uint64_t be(uint64_t* ptr) noexcept {
+//     uint64_t x = *ptr;
+// #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+//     x = __builtin_bswap64(x);
+// #endif
+//     return x;
+// }
+
 inline bool check() noexcept {
-	hsah = sha256(d + to_string(nonce));
-	if (hsah[0] != 0)
+	hsah = (uint64_t*) sha256(d + to_string(nonce));
+	if (*hsah > 0x0fffffffffffffff)
 		return false;
 
 	switch (blockNum) {
 		case 0:
-			if (be(hsah) <= go) 
+			if (be(hsah) <= go)
 				return true;
+
 			return false;
 		case 1:
-			if (be(hsah) == 0 && be(hsah + 1) <= go) 
+			if (be(hsah) == 0 && be(hsah + 1) <= go)
 				return true;
+
 			return false;
 		case 2:
-			if (be(hsah) == 0 && be(hsah + 1) == 0 && be(hsah + 2) <= go) 
+			if (be(hsah) == 0 && be(hsah + 1) == 0 && be(hsah + 2) <= go)
 				return true;
+
 			return false;
 		case 3:
 			if (be(hsah) == 0 && be(hsah + 1) == 0 && be(hsah + 2) == 0 && be(hsah + 3) <= go)
 				return true;
+
 			return false;
 	}
 
@@ -54,14 +66,20 @@ int main() {
 
 	blockNum = n / 16;
 	go = 0xffffffffffffffff >> ((n * 4) % 64);
+
+	auto fuckall = sha256("Hello PoW12896");
+	cout << to_hex(fuckall) << endl << be((uint64_t*)fuckall) << endl << go << endl;
 	cout << "GO\n\n";
+	delete fuckall;
 
 	while (true) {
 		if (check()) {
-			cout << "Nonce = " << nonce << "\nHash = " << to_hex(hsah) << "\nTry = " << nonce + 1;
+			cout << "Nonce = " << nonce << "\nHash = " << to_hex((uint8_t*)hsah) << "\nTry = " << nonce + 1;
+			delete hsah;
 			return 0;
 		}
 
+		delete hsah;
 		if (++nonce == 0)
 			break;
 	}

@@ -108,8 +108,9 @@ string final_hex(uint8_t* data, size_t length) noexcept {
         transform(buffer + 64);
 
     stringstream ss;
+    ss << std::hex << setfill('0');
     for (size_t j = 0; j < 8; ++j)
-        ss << std::hex << setw(8) << setfill('0') << state[j];
+        ss << setw(8) << state[j];
         
     return ss.str();
 }

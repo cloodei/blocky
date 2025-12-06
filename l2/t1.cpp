@@ -123,6 +123,6 @@ int main() {
 	chain[3].data = "not good";
 	cout << isOK() << "\n\n";
 	trace();
-	
+
     return 0;
 }
