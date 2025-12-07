@@ -13,16 +13,6 @@ struct Block {
 };
 vector<Block> chain;
 
-inline bool cmp(const char* str1, const char* str2) noexcept {
-	size_t* s1 = (size_t*) str1, *s2 = (size_t*) str2;
-	size_t* o1 = s1, *o2 = s2;
-	size_t* t1 = s1 + 1, *t2 = s2 + 1;
-	size_t* th1 = s1 + 2, *th2 = s2 + 2;
-	size_t* f1 = s1 + 3, *f2 = s2 + 3;
-
-	return (*o1 == *o2 && *t1 == *t2 && *th1 == *th2 && *f1 == *f2);
-}
-
 inline bool cmp(const uint8_t* str1, const uint8_t* str2) noexcept {
 	size_t* s1 = (size_t*) str1, *s2 = (size_t*) str2;
 	size_t* o1 = s1, *o2 = s2;
@@ -90,20 +80,20 @@ void trace() {
 	if (!cmp(hash, chain[0].hash))
 		cerr << "BLOCK 0 CHECK HASH ERROR\n";
 
-	for (size_t i = n - 1; i; --i) {
+	for (size_t i = 1; i < n; ++i) {
 		auto& b = chain[i];
 		memcpy((uint8_t*)s.data(), b.prev_hash, 32);
 
 		delete hash;
 		hash = sha256(to_string(chain[i].index) + b.data + s);
 
-		cout << n - i + 1 << ": CHECK HASH = " << to_hex(hash) << " | " << n - i + 1 << ": BLOCK HASH = " << to_hex(b.hash) << '\n';
+		cout << i << ": CHECK HASH = " << to_hex(hash) << " | " << i << ": BLOCK HASH = " << to_hex(b.hash) << '\n';
 		if (!cmp(hash, b.hash))
-			cerr << "BLOCK " << n - i + 1 << " CHECK HASH ERROR\n";
+			cerr << "BLOCK " << i << " CHECK HASH ERROR\n";
 
-		cout << n - i + 1 << ": CURR PREV_HASH = " << to_hex(b.prev_hash) << " | " << n - i << ": PREV HASH = " << to_hex(chain[i - 1].hash) << '\n';
+		cout << i << ": CURR PREV_HASH = " << to_hex(b.prev_hash) << " | " << i - 1 << ": PREV HASH = " << to_hex(chain[i - 1].hash) << '\n';
 		if (!cmp(b.prev_hash, chain[i - 1].hash))
-			cerr << "BLOCK " << n - i << " HASH != BLOCK " << n - i + 1 << " MISMATCH ERROR\n";
+			cerr << "BLOCK " << i << " HASH != BLOCK " << i - 1 << " MISMATCH ERROR\n";
 	}
 	
 	delete hash;

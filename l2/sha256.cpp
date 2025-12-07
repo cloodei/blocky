@@ -7,7 +7,7 @@
 using namespace std;
 
 
-static uint32_t state[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+static uint32_t state[8];
 static constexpr uint32_t K[64] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -162,7 +162,6 @@ inline string to_hex(const uint8_t* d) noexcept {
 
 
 inline string sha2(uint8_t* input, size_t length) noexcept {
-    auto res = final_hex(input, length);
     state[0] = 0x6a09e667;
     state[1] = 0xbb67ae85;
     state[2] = 0x3c6ef372;
@@ -171,6 +170,7 @@ inline string sha2(uint8_t* input, size_t length) noexcept {
     state[5] = 0x9b05688c;
     state[6] = 0x1f83d9ab;
     state[7] = 0x5be0cd19;
+    auto res = final_hex(input, length);
 
     return res;
 }
@@ -180,7 +180,6 @@ inline string sha2(const string& input) noexcept {
 }
 
 inline uint8_t* sha256(uint8_t* input, size_t length) noexcept {
-    auto res = final(input, length);
     state[0] = 0x6a09e667;
     state[1] = 0xbb67ae85;
     state[2] = 0x3c6ef372;
@@ -189,6 +188,7 @@ inline uint8_t* sha256(uint8_t* input, size_t length) noexcept {
     state[5] = 0x9b05688c;
     state[6] = 0x1f83d9ab;
     state[7] = 0x5be0cd19;
+    auto res = final(input, length);
 
     return res;
 }

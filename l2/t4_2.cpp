@@ -4,32 +4,23 @@
 #include "sha256.cpp"
 using namespace std;
 
+
 uint32_t n, nonce = 0;
 uint64_t blockNum, go;
 uint64_t* hsah;
 const string d = "Hello PoW";
 
-inline uint64_t be(uint64_t* ptr) noexcept {
-    uint64_t x;
-    memcpy(&x, (uint8_t*)ptr, 8);
+inline uint64_t be(uint64_t* p) noexcept {
+    uint64_t x = *p;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     x = __builtin_bswap64(x);
 #endif
-
     return x;
 }
 
-// inline uint64_t be(uint64_t* ptr) noexcept {
-//     uint64_t x = *ptr;
-// #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-//     x = __builtin_bswap64(x);
-// #endif
-//     return x;
-// }
-
 inline bool check() noexcept {
 	hsah = (uint64_t*) sha256(d + to_string(nonce));
-	if (*hsah > 0x0fffffffffffffff)
+	if (be(hsah) > 0x0fffffffffffffff)
 		return false;
 
 	switch (blockNum) {
@@ -66,11 +57,7 @@ int main() {
 
 	blockNum = n / 16;
 	go = 0xffffffffffffffff >> ((n * 4) % 64);
-
-	auto fuckall = sha256("Hello PoW12896");
-	cout << to_hex(fuckall) << endl << be((uint64_t*)fuckall) << endl << go << endl;
 	cout << "GO\n\n";
-	delete fuckall;
 
 	while (true) {
 		if (check()) {

@@ -9,7 +9,7 @@ int main() {
 	unordered_map<string, long long> chain;
 	string from, amount, to;
 	ifstream file("trans.txt");
-	
+
 	while (file >> from) {
 		file >> amount >> to;
 		
@@ -17,10 +17,9 @@ int main() {
 		chain[from] -= n;
 		chain[to] += n;
 	}
-	
+
 	for (auto p : chain)
 		cout << p.first << ": " << p.second << '\n';;
 
     return 0;
 }
-

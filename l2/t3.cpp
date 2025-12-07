@@ -48,4 +48,3 @@ int main() {
 	cout << "\nSize: " << cap << "KB\nFee: " << tax << " BTC";
     return 0;
 }
-
